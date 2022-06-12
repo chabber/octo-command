@@ -2,7 +2,7 @@ package data
 
 import (
 	"fmt"
-	"octocommand/octo/models"
+	"octo-command/octo/models"
 
 	scribble "github.com/nanobox-io/golang-scribble"
 )

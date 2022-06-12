@@ -1,8 +1,7 @@
 package main
 
 import (
-	"octocommand/cmd"
-	"os"
+	"octo-command/cmd"
 
 	cobraprompt "github.com/stromland/cobra-prompt"
 )
@@ -11,12 +10,11 @@ var simplePrompt = &cobraprompt.CobraPrompt{
 	RootCmd:                  cmd.RootCmd,
 	AddDefaultExitCommand:    true,
 	DisableCompletionCommand: true,
+	OnErrorFunc: func(err error) {
+		cmd.RootCmd.PrintErrln(err)
+	},
 }
 
 func main() {
-	if os.Args[1] == "i" {
-		simplePrompt.Run()
-	} else {
-		cmd.RootCmd.Execute()
-	}
+	simplePrompt.Run()
 }

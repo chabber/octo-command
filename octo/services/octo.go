@@ -3,10 +3,11 @@ package services
 import (
 	"fmt"
 	"log"
-	"octocommand/octo/data"
-	"octocommand/octo/models"
+	"octo-command/octo/data"
+	"octo-command/octo/models"
+	"os"
 
-	"github.com/ugurgudelek/go-octoprint"
+	"github.com/chabber/go-octoprint"
 )
 
 type OctoService struct {
@@ -23,6 +24,37 @@ func (os *OctoService) AddServer(n string, u string, k string) {
 	data.SaveServer(s)
 }
 
+func (osvc *OctoService) UploadFile(src string, dst string) {
+	if osvc.client == nil {
+		fmt.Println("Not connected to OctoPrint service")
+		return
+	}
+
+	r := octoprint.UploadFileRequest{
+		Select:   false,
+		Location: octoprint.Local,
+		Print:    false,
+	}
+
+	reader, err := os.Open(src)
+	if err != nil {
+		log.Printf("Error opening file for upload: %s", err)
+		return
+	}
+
+	err = r.AddFile(dst, reader)
+	if err != nil {
+		log.Printf("Error adding file for upload: %s", err)
+		return
+	}
+
+	_, err = r.Do(osvc.client)
+	if err != nil {
+		log.Printf("Error uploading file to server: %s", err)
+		return
+	}
+}
+
 func (os *OctoService) ToolState() {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
@@ -33,31 +65,57 @@ func (os *OctoService) ToolState() {
 		Limit:   100,
 	}
 
-	ts, err := r.Do(os.client)
+	_, err := r.Do(os.client)
 
 	if err != nil {
 		log.Printf("Error getting tool state: %s", err)
 	}
-
-	fmt.Print(string(ts.UnmarshalJSON())
-
 }
-
-func (os *OctoService) Connect(u string, k string, n string) {
-	if n != "" {
-		s := data.GetServer(n)
-		os.client = octoprint.NewClient(s.Url, s.ApiKey)
-	} else {
-		os.client = octoprint.NewClient(u, k)
+func (os *OctoService) ListFiles(dir string) {
+	if os.client == nil {
+		fmt.Println("Not connected to OctoPrint service")
+		return
 	}
 
-	r := octoprint.ConnectionRequest{}
-	s, err := r.Do(os.client)
+	r := octoprint.FilesRequest{
+		Location:  octoprint.Local,
+		Recursive: true,
+	}
+	resp, err := r.Do(os.client)
 	if err != nil {
 		log.Printf("Error connecting to OctoPrint: %s", err)
 	}
 
-	fmt.Printf("Connection State: %q\n", s.Current.State)
+	printFileList(resp.Files, 0)
+}
+
+func printFileList(f []*octoprint.FileInformation, level int) {
+	var indent string = ""
+	for x := 0; x < level; x++ {
+		indent = indent + "   "
+	}
+
+	for _, f := range f {
+		if f.IsFolder() {
+			fmt.Printf("%s[%s]\n", indent, f.Name)
+			printFileList(f.Children, level+1)
+		} else {
+			fmt.Printf("%s%s\n", indent, f.Name)
+		}
+	}
+}
+
+func (os *OctoService) Connect(n string) {
+	s := data.GetServer(n)
+	os.client = octoprint.NewClient(s.Url, s.ApiKey)
+
+	r := octoprint.ConnectionRequest{}
+	resp, err := r.Do(os.client)
+	if err != nil {
+		log.Printf("Error connecting to OctoPrint: %s", err)
+	}
+
+	fmt.Printf("Connection State: %q\n", resp.Current.State)
 }
 
 func (os *OctoService) Home() {

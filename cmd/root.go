@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -8,9 +9,11 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "OctoCommand",
-	Short: "CLI for OctoPrint",
-	Long:  `A command line interface for interacting with OctoPrint`,
+	Use:           "OctoCommand",
+	Short:         "CLI for OctoPrint",
+	Long:          `A command line interface for interacting with OctoPrint`,
+	SilenceErrors: true,
+	SilenceUsage:  false,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -18,6 +21,7 @@ var RootCmd = &cobra.Command{
 func Execute() {
 	err := RootCmd.Execute()
 	if err != nil {
+		fmt.Print("exiting!!!!")
 		os.Exit(1)
 	}
 }
