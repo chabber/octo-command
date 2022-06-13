@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"octo-command/octo"
 	svc "octo-command/octo/services"
 	"strconv"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -38,14 +40,14 @@ var homeCmd = &cobra.Command{
 	},
 }
 
-var bedTempCmd = &cobra.Command{
+var setBedTempCmd = &cobra.Command{
 	Use:   "bedtemp",
 	Short: "Bed temperature",
 	Long:  "Set the bed temperature",
 	Run: func(cmd *cobra.Command, args []string) {
 		if f, err := strconv.ParseFloat(args[0], 64); err == nil {
 			if f <= octo.MAX_BED_TEMPERATURE {
-				octoSvc.BedTemp(f)
+				octoSvc.SetBedTemp(f)
 			} else {
 				fmt.Println("Temperature exceeds max bed temperature of", octo.MAX_BED_TEMPERATURE)
 			}
@@ -64,12 +66,64 @@ var addServerCmd = &cobra.Command{
 	},
 }
 
+var getToolTempCmd = &cobra.Command{
+	Use:   "gettooltemp",
+	Short: "Get tool temp",
+	Long:  "Retrieve tool temperatures from OctoPrint server",
+	Run: func(cmd *cobra.Command, args []string) {
+		temps, err := octoSvc.GetToolTemp()
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		for _, t := range temps {
+			fmt.Printf("[%s]\n", t.Label)
+			fmt.Printf("Actual: %.2f, Target: %.2f, Offset: %.2f\n", t.Actual, t.Target, t.Offset)
+		}
+	},
+}
+var getBedTempCmd = &cobra.Command{
+	Use:   "getbedtemp",
+	Short: "Get bed temp",
+	Long:  "Retrieve bed temperature from OctoPrint server",
+	Run: func(cmd *cobra.Command, args []string) {
+		t, err := octoSvc.GetBedTemp()
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		quit := make(chan bool)
+
+		go func() {
+			for {
+				select {
+				case <-quit:
+					fmt.Println()
+					return
+				default:
+					t, _ = octoSvc.GetBedTemp()
+				}
+				fmt.Printf("Actual: %.2f, Target: %.2f, Offset: %.2f\r", t.Actual, t.Target, t.Offset)
+				time.Sleep(3 * time.Second)
+			}
+		}()
+
+		// wait for keyboard input to kill thread
+		fmt.Scanf("%s")
+		quit <- true
+	},
+}
+
 var listFilesCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List files",
 	Long:  "List file from OctoPrint server",
 	Run: func(cmd *cobra.Command, args []string) {
-		octoSvc.ListFiles(args[0])
+		octoSvc.GetFiles(args[0])
 	},
 }
 
@@ -102,11 +156,13 @@ func init() {
 
 	RootCmd.AddCommand(connectCmd)
 	RootCmd.AddCommand(homeCmd)
-	RootCmd.AddCommand(bedTempCmd)
+	RootCmd.AddCommand(setBedTempCmd)
 	RootCmd.AddCommand(addServerCmd)
 	RootCmd.AddCommand(toolStateCmd)
 	RootCmd.AddCommand(uploadFileCmd)
 	RootCmd.AddCommand(listFilesCmd)
+	RootCmd.AddCommand(getBedTempCmd)
+	RootCmd.AddCommand(getToolTempCmd)
 
 	// Add server command
 	addServerCmd.Flags().StringVarP(&name, "name", "n", "", "Name for saved server")

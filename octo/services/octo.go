@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"octo-command/octo/data"
@@ -24,9 +25,64 @@ func (os *OctoService) AddServer(n string, u string, k string) {
 	data.SaveServer(s)
 }
 
+func (os *OctoService) GetToolTemp() ([]*models.Temperature, error) {
+	if os.client == nil {
+		return nil, errors.New("error: not connected to OctoPrint server")
+	}
+
+	r := octoprint.ToolStateRequest{}
+
+	resp, err := r.Do(os.client)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var temps []*models.Temperature
+
+	for k, v := range resp.Current {
+		t := models.Temperature{
+			Actual: v.Actual,
+			Target: v.Target,
+			Offset: v.Offset,
+			Label:  k,
+		}
+
+		temps = append(temps, &t)
+	}
+
+	return temps, nil
+}
+
+func (os *OctoService) GetBedTemp() (*models.Temperature, error) {
+	if os.client == nil {
+		return nil, errors.New("error: not connected to OctoPrint server")
+	}
+
+	r := octoprint.BedStateRequest{}
+
+	resp, err := r.Do(os.client)
+
+	if err != nil {
+		return nil, err
+	}
+
+	t := new(models.Temperature)
+
+	if d, found := resp.Current["bed"]; found {
+		t.Actual = d.Actual
+		t.Target = d.Target
+		t.Offset = d.Offset
+	} else {
+		return nil, errors.New("error: bed temperature not available")
+	}
+
+	return t, nil
+}
+
 func (osvc *OctoService) UploadFile(src string, dst string) {
 	if osvc.client == nil {
-		fmt.Println("Not connected to OctoPrint service")
+		fmt.Println("Not connected to OctoPrint server")
 		return
 	}
 
@@ -71,7 +127,7 @@ func (os *OctoService) ToolState() {
 		log.Printf("Error getting tool state: %s", err)
 	}
 }
-func (os *OctoService) ListFiles(dir string) {
+func (os *OctoService) GetFiles(dir string) {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
 		return
@@ -129,7 +185,7 @@ func (os *OctoService) Home() {
 	r.Do(os.client)
 }
 
-func (os *OctoService) BedTemp(t float64) {
+func (os *OctoService) SetBedTemp(t float64) {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
 		return
