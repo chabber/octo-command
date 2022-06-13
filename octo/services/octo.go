@@ -25,6 +25,17 @@ func (os *OctoService) AddServer(n string, u string, k string) {
 	data.SaveServer(s)
 }
 
+func (os *OctoService) PrintFile() error {
+	if os.client == nil {
+		return errors.New("error: not connected to OctoPrint server")
+	}
+
+	// select file
+	// print file
+
+	return nil
+}
+
 func (os *OctoService) GetToolTemp() ([]*models.Temperature, error) {
 	if os.client == nil {
 		return nil, errors.New("error: not connected to OctoPrint server")
