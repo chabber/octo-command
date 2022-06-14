@@ -31,6 +31,16 @@ var connectCmd = &cobra.Command{
 	},
 }
 
+var printFileCmd = &cobra.Command{
+	Use:   "printfile",
+	Short: "Print a file",
+	Long:  "Send request to OctoPrint server to print selected file",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		octoSvc.PrintFile(args[0])
+	},
+}
+
 var homeCmd = &cobra.Command{
 	Use:   "home",
 	Short: "Home position",
@@ -163,6 +173,7 @@ func init() {
 	RootCmd.AddCommand(listFilesCmd)
 	RootCmd.AddCommand(getBedTempCmd)
 	RootCmd.AddCommand(getToolTempCmd)
+	RootCmd.AddCommand(printFileCmd)
 
 	// Add server command
 	addServerCmd.Flags().StringVarP(&name, "name", "n", "", "Name for saved server")
