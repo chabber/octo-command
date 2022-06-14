@@ -25,13 +25,20 @@ func (os *OctoService) AddServer(n string, u string, k string) {
 	data.SaveServer(s)
 }
 
-func (os *OctoService) PrintFile() error {
+func (os *OctoService) PrintFile(f string) error {
 	if os.client == nil {
 		return errors.New("error: not connected to OctoPrint server")
 	}
 
-	// select file
-	// print file
+	sel := octoprint.SelectFileRequest{
+		Location: octoprint.Local,
+		Path:     f,
+		Print:    true,
+	}
+	err := sel.Do(os.client)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

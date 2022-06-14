@@ -35,8 +35,9 @@ var printFileCmd = &cobra.Command{
 	Use:   "printfile",
 	Short: "Print a file",
 	Long:  "Send request to OctoPrint server to print selected file",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		octoSvc.PrintFile()
+		octoSvc.PrintFile(args[0])
 	},
 }
 
