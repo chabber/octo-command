@@ -15,10 +15,11 @@ var addTempCmd = &cobra.Command{
 	Long:  "Add a bed and tool temp as a temp profile",
 	Args:  cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
-		var bedTemp, toolTemp int
+		var bedTemp, toolTemp float64
 		fmt.Printf("args1: %s, args2: %s\n", args[1], args[2])
+
 		// validate bed temperature
-		bedTemp, err := strconv.Atoi(args[1])
+		bedTemp, err := strconv.ParseFloat(args[1], 64)
 		if err != nil {
 			fmt.Println("Bed temperature must be a valid number.")
 			return
@@ -28,7 +29,7 @@ var addTempCmd = &cobra.Command{
 		}
 
 		// validate tool temperature
-		toolTemp, err = strconv.Atoi(args[2])
+		toolTemp, err = strconv.ParseFloat(args[2], 64)
 		if err != nil {
 			fmt.Println("Tool temperature must be a valid number.L ", err)
 			return
@@ -38,7 +39,7 @@ var addTempCmd = &cobra.Command{
 			return
 		}
 
-		octoSvc.AddTemp(args[0], bedTemp, toolTemp)
+		octoSvc.AddTempProfile(args[0], bedTemp, toolTemp)
 	},
 }
 

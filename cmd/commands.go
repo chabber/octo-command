@@ -36,29 +36,13 @@ var homeCmd = &cobra.Command{
 	},
 }
 
-/*var setBedTempCmd = &cobra.Command{
-	Use:   "bedtemp",
-	Short: "Bed temperature",
-	Long:  "Set the bed temperature",
-	Run: func(cmd *cobra.Command, args []string) {
-		if f, err := strconv.ParseInt(args[0], 10, 64); err == nil {
-			if f <= octo.MAX_BED_TEMPERATURE {
-				octoSvc.SetBedTemp(f)
-			} else {
-				fmt.Println("Temperature exceeds max bed temperature of", octo.MAX_BED_TEMPERATURE)
-			}
-		} else {
-			fmt.Println("Temperature must be a valid number.")
-		}
-	},
-}*/
-
 var addServerCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add server",
 	Long:  "Add an OctoPrint server as saved server",
+	Args:  cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
-		octoSvc.AddServer(name, url, apiKey)
+		octoSvc.AddServerProfile(args[0], args[1], args[2])
 	},
 }
 
@@ -118,16 +102,10 @@ func init() {
 	octoSvc = new(svc.OctoService)
 
 	RootCmd.AddCommand(homeCmd)
-	//RootCmd.AddCommand(setBedTempCmd)
 	RootCmd.AddCommand(addServerCmd)
 	RootCmd.AddCommand(toolStateCmd)
 	RootCmd.AddCommand(uploadFileCmd)
 	RootCmd.AddCommand(listFilesCmd)
 	RootCmd.AddCommand(getToolTempCmd)
 	RootCmd.AddCommand(printFileCmd)
-
-	// Add server command
-	addServerCmd.Flags().StringVarP(&name, "name", "n", "", "Name for saved server")
-	addServerCmd.Flags().StringVarP(&url, "url", "u", "", "URL for saved server")
-	addServerCmd.Flags().StringVarP(&apiKey, "apikey", "k", "", "API key for saved server")
 }

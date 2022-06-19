@@ -7,9 +7,9 @@ type ServerProfile struct {
 }
 
 type TempProfile struct {
-	Name     string `json: "Name"`
-	BedTemp  int    `json: "BedTemp"`
-	ToolTemp int    `json: "ToolTemp"`
+	Name     string  `json: "Name"`
+	BedTemp  float64 `json: "BedTemp"`
+	ToolTemp float64 `json: "ToolTemp"`
 }
 
 type Temperature struct {

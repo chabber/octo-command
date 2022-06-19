@@ -21,7 +21,7 @@ func SaveServerProfile(s models.ServerProfile) {
 	db.Write(SERVER_PROFILE_STORE, s.Name, s)
 }
 
-func GetServer(n string) models.ServerProfile {
+func GetServerProfile(n string) models.ServerProfile {
 	db, err := scribble.New(".", nil)
 	if err != nil {
 		fmt.Println("Error", err)
