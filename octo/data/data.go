@@ -7,23 +7,49 @@ import (
 	scribble "github.com/nanobox-io/golang-scribble"
 )
 
-func SaveServer(s models.Server) {
+const (
+	SERVER_PROFILE_STORE string = ".store/server_profiles"
+	TEMP_PROFILE_STORE   string = ".store/temp_profiles"
+)
+
+func SaveServerProfile(s models.ServerProfile) {
 	db, err := scribble.New(".", nil)
 	if err != nil {
 		fmt.Println("Error", err)
 	}
 
-	db.Write("servers", s.Name, s)
+	db.Write(SERVER_PROFILE_STORE, s.Name, s)
 }
 
-func GetServer(n string) models.Server {
+func GetServer(n string) models.ServerProfile {
 	db, err := scribble.New(".", nil)
 	if err != nil {
 		fmt.Println("Error", err)
 	}
 
-	s := models.Server{}
-	db.Read("servers", n, &s)
+	rec := models.ServerProfile{}
+	db.Read(SERVER_PROFILE_STORE, n, &rec)
 
-	return s
+	return rec
+}
+
+func SaveTempProfile(s models.TempProfile) {
+	db, err := scribble.New(".", nil)
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+
+	db.Write(TEMP_PROFILE_STORE, s.Name, s)
+}
+
+func GetTempProfile(n string) models.TempProfile {
+	db, err := scribble.New(".", nil)
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+
+	rec := models.TempProfile{}
+	db.Read("TEMP_PROFILE_STORE", n, &rec)
+
+	return rec
 }

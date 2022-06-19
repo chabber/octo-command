@@ -15,14 +15,26 @@ type OctoService struct {
 	client *octoprint.Client
 }
 
+func (os *OctoService) AddTemp(n string, bed int, tool int) error {
+	tp := models.TempProfile{
+		Name:     n,
+		BedTemp:  bed,
+		ToolTemp: tool,
+	}
+
+	data.SaveTempProfile(tp)
+
+	return nil
+}
+
 func (os *OctoService) AddServer(n string, u string, k string) {
-	s := models.Server{
+	s := models.ServerProfile{
 		Name:   n,
 		Url:    u,
 		ApiKey: k,
 	}
 
-	data.SaveServer(s)
+	data.SaveServerProfile(s)
 }
 
 func (os *OctoService) PrintFile(f string) error {
@@ -203,13 +215,13 @@ func (os *OctoService) Home() {
 	r.Do(os.client)
 }
 
-func (os *OctoService) SetBedTemp(t float64) {
+func (os *OctoService) SetBedTemp(t int64) {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
 		return
 	}
 	r := octoprint.BedTargetRequest{
-		Target: t,
+		Target: float64(t),
 	}
 	r.Do(os.client)
 }

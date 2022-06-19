@@ -3,10 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"octo-command/octo"
 	svc "octo-command/octo/services"
-	"strconv"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -19,17 +16,6 @@ var (
 	url    string
 	apiKey string
 )
-
-// connectCmd represents the start command
-var connectCmd = &cobra.Command{
-	Use:   "connect",
-	Short: "Connect to OctoPrint server",
-	Long:  "Connect to OctoPrint server by supplying URL and API key",
-	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		octoSvc.Connect(args[0])
-	},
-}
 
 var printFileCmd = &cobra.Command{
 	Use:   "printfile",
@@ -50,12 +36,12 @@ var homeCmd = &cobra.Command{
 	},
 }
 
-var setBedTempCmd = &cobra.Command{
+/*var setBedTempCmd = &cobra.Command{
 	Use:   "bedtemp",
 	Short: "Bed temperature",
 	Long:  "Set the bed temperature",
 	Run: func(cmd *cobra.Command, args []string) {
-		if f, err := strconv.ParseFloat(args[0], 64); err == nil {
+		if f, err := strconv.ParseInt(args[0], 10, 64); err == nil {
 			if f <= octo.MAX_BED_TEMPERATURE {
 				octoSvc.SetBedTemp(f)
 			} else {
@@ -65,7 +51,7 @@ var setBedTempCmd = &cobra.Command{
 			fmt.Println("Temperature must be a valid number.")
 		}
 	},
-}
+}*/
 
 var addServerCmd = &cobra.Command{
 	Use:   "add",
@@ -92,39 +78,6 @@ var getToolTempCmd = &cobra.Command{
 			fmt.Printf("[%s]\n", t.Label)
 			fmt.Printf("Actual: %.2f, Target: %.2f, Offset: %.2f\n", t.Actual, t.Target, t.Offset)
 		}
-	},
-}
-var getBedTempCmd = &cobra.Command{
-	Use:   "getbedtemp",
-	Short: "Get bed temp",
-	Long:  "Retrieve bed temperature from OctoPrint server",
-	Run: func(cmd *cobra.Command, args []string) {
-		t, err := octoSvc.GetBedTemp()
-
-		if err != nil {
-			log.Println(err)
-			return
-		}
-
-		quit := make(chan bool)
-
-		go func() {
-			for {
-				select {
-				case <-quit:
-					fmt.Println()
-					return
-				default:
-					t, _ = octoSvc.GetBedTemp()
-				}
-				fmt.Printf("Actual: %.2f, Target: %.2f, Offset: %.2f\r", t.Actual, t.Target, t.Offset)
-				time.Sleep(3 * time.Second)
-			}
-		}()
-
-		// wait for keyboard input to kill thread
-		fmt.Scanf("%s")
-		quit <- true
 	},
 }
 
@@ -164,14 +117,12 @@ var uploadFileCmd = &cobra.Command{
 func init() {
 	octoSvc = new(svc.OctoService)
 
-	RootCmd.AddCommand(connectCmd)
 	RootCmd.AddCommand(homeCmd)
-	RootCmd.AddCommand(setBedTempCmd)
+	//RootCmd.AddCommand(setBedTempCmd)
 	RootCmd.AddCommand(addServerCmd)
 	RootCmd.AddCommand(toolStateCmd)
 	RootCmd.AddCommand(uploadFileCmd)
 	RootCmd.AddCommand(listFilesCmd)
-	RootCmd.AddCommand(getBedTempCmd)
 	RootCmd.AddCommand(getToolTempCmd)
 	RootCmd.AddCommand(printFileCmd)
 

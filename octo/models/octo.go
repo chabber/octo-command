@@ -1,9 +1,15 @@
 package models
 
-type Server struct {
+type ServerProfile struct {
 	Name   string
 	Url    string
 	ApiKey string
+}
+
+type TempProfile struct {
+	Name     string `json: "Name"`
+	BedTemp  int    `json: "BedTemp"`
+	ToolTemp int    `json: "ToolTemp"`
 }
 
 type Temperature struct {
