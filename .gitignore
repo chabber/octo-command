@@ -5,6 +5,7 @@
 
 # App-specific files
 .store/*
+*.gcode
 
 # User-specific files
 *.rsuser
