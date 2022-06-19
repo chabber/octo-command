@@ -15,14 +15,34 @@ type OctoService struct {
 	client *octoprint.Client
 }
 
-func (os *OctoService) AddServer(n string, u string, k string) {
-	s := models.Server{
+func (os *OctoService) AddTempProfile(n string, bed float64, tool float64) error {
+	tp := models.TempProfile{
+		Name:     n,
+		BedTemp:  bed,
+		ToolTemp: tool,
+	}
+
+	data.SaveTempProfile(tp)
+
+	return nil
+}
+
+func (os *OctoService) AddServerProfile(n string, u string, k string) {
+	s := models.ServerProfile{
 		Name:   n,
 		Url:    u,
 		ApiKey: k,
 	}
 
-	data.SaveServer(s)
+	data.SaveServerProfile(s)
+}
+
+func (os *OctoService) GetServerProfile(n string) models.ServerProfile {
+	return data.GetServerProfile(n)
+}
+
+func (os *OctoService) GetTempProfile(n string) models.TempProfile {
+	return data.GetTempProfile(n)
 }
 
 func (os *OctoService) PrintFile(f string) error {
@@ -180,7 +200,7 @@ func printFileList(f []*octoprint.FileInformation, level int) {
 }
 
 func (os *OctoService) Connect(n string) {
-	s := data.GetServer(n)
+	s := data.GetServerProfile(n)
 	os.client = octoprint.NewClient(s.Url, s.ApiKey)
 
 	r := octoprint.ConnectionRequest{}
@@ -209,7 +229,23 @@ func (os *OctoService) SetBedTemp(t float64) {
 		return
 	}
 	r := octoprint.BedTargetRequest{
-		Target: t,
+		Target: float64(t),
 	}
+	r.Do(os.client)
+}
+
+func (os *OctoService) SetToolTemp(t float64) {
+	if os.client == nil {
+		fmt.Println("Not connected to OctoPrint service")
+		return
+	}
+
+	targets := make(map[string]float64)
+	targets["tool0"] = t
+
+	r := octoprint.ToolTargetRequest{
+		Targets: targets,
+	}
+
 	r.Do(os.client)
 }
