@@ -8,14 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	octoSvc *svc.OctoService
-
-	// flags
-	name   string
-	url    string
-	apiKey string
-)
+var octoSvc *svc.OctoService
 
 var printFileCmd = &cobra.Command{
 	Use:   "printfile",
@@ -33,16 +26,6 @@ var homeCmd = &cobra.Command{
 	Long:  "Return the print head to home position",
 	Run: func(cmd *cobra.Command, args []string) {
 		octoSvc.Home()
-	},
-}
-
-var addServerCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add server",
-	Long:  "Add an OctoPrint server as saved server",
-	Args:  cobra.ExactArgs(3),
-	Run: func(cmd *cobra.Command, args []string) {
-		octoSvc.AddServerProfile(args[0], args[1], args[2])
 	},
 }
 
@@ -102,7 +85,7 @@ func init() {
 	octoSvc = new(svc.OctoService)
 
 	RootCmd.AddCommand(homeCmd)
-	RootCmd.AddCommand(addServerCmd)
+	RootCmd.AddCommand(serverCmd)
 	RootCmd.AddCommand(toolStateCmd)
 	RootCmd.AddCommand(uploadFileCmd)
 	RootCmd.AddCommand(listFilesCmd)

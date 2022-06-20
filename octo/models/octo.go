@@ -1,9 +1,10 @@
 package models
 
 type ServerProfile struct {
-	Name   string
-	Url    string
-	ApiKey string
+	Name    string
+	Url     string
+	ApiKey  string
+	Default bool
 }
 
 type TempProfile struct {
