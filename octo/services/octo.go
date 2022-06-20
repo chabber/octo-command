@@ -27,18 +27,20 @@ func (os *OctoService) AddTempProfile(n string, bed float64, tool float64) error
 	return nil
 }
 
-func (os *OctoService) AddServerProfile(n string, u string, k string) {
-	s := models.ServerProfile{
-		Name:   n,
-		Url:    u,
-		ApiKey: k,
-	}
-
-	data.SaveServerProfile(s)
+func (os *OctoService) SaveServerProfile(p models.ServerProfile) {
+	data.SaveServerProfile(p)
 }
 
-func (os *OctoService) GetServerProfile(n string) models.ServerProfile {
+func (os *OctoService) GetDefaultServerProfile() (*models.ServerProfile, error) {
+	return data.GetDefaultServerProfile()
+}
+
+func (os *OctoService) GetServerProfile(n string) (*models.ServerProfile, error) {
 	return data.GetServerProfile(n)
+}
+
+func (os *OctoService) DeleteServerProfile(n string) (err error) {
+	return data.DeleteServerProfile(n)
 }
 
 func (os *OctoService) GetServerProfiles() []models.ServerProfile {
@@ -203,17 +205,16 @@ func printFileList(f []*octoprint.FileInformation, level int) {
 	}
 }
 
-func (os *OctoService) Connect(n string) {
-	s := data.GetServerProfile(n)
+func (os *OctoService) Connect(s *models.ServerProfile) (state *string, err error) {
 	os.client = octoprint.NewClient(s.Url, s.ApiKey)
 
 	r := octoprint.ConnectionRequest{}
 	resp, err := r.Do(os.client)
 	if err != nil {
-		log.Printf("Error connecting to OctoPrint: %s", err)
+		return nil, err
 	}
 
-	fmt.Printf("Connection State: %q\n", resp.Current.State)
+	return (*string)(&resp.Current.State), nil
 }
 
 func (os *OctoService) Home() {
