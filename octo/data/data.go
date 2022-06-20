@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/json"
 	"fmt"
 	"octo-command/octo/models"
 
@@ -31,6 +32,25 @@ func GetServerProfile(n string) models.ServerProfile {
 	db.Read(SERVER_PROFILE_STORE, n, &rec)
 
 	return rec
+}
+
+func GetServerProfiles() []models.ServerProfile {
+	db, err := scribble.New(".", nil)
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+
+	var profiles []models.ServerProfile
+
+	ps, _ := db.ReadAll(SERVER_PROFILE_STORE)
+	for _, p := range ps {
+		var profile models.ServerProfile
+		json.Unmarshal([]byte(p), &profile)
+
+		profiles = append(profiles, profile)
+	}
+
+	return profiles
 }
 
 func SaveTempProfile(s models.TempProfile) {

@@ -41,6 +41,10 @@ func (os *OctoService) GetServerProfile(n string) models.ServerProfile {
 	return data.GetServerProfile(n)
 }
 
+func (os *OctoService) GetServerProfiles() []models.ServerProfile {
+	return data.GetServerProfiles()
+}
+
 func (os *OctoService) GetTempProfile(n string) models.TempProfile {
 	return data.GetTempProfile(n)
 }
