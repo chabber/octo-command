@@ -10,25 +10,6 @@ import (
 
 var octoSvc *svc.OctoService
 
-var printFileCmd = &cobra.Command{
-	Use:   "printfile",
-	Short: "Print a file",
-	Long:  "Send request to OctoPrint server to print selected file",
-	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		octoSvc.PrintFile(args[0])
-	},
-}
-
-var homeCmd = &cobra.Command{
-	Use:   "home",
-	Short: "Home position",
-	Long:  "Return the print head to home position",
-	Run: func(cmd *cobra.Command, args []string) {
-		octoSvc.Home()
-	},
-}
-
 var getToolTempCmd = &cobra.Command{
 	Use:   "gettooltemp",
 	Short: "Get tool temp",
@@ -84,11 +65,9 @@ var uploadFileCmd = &cobra.Command{
 func init() {
 	octoSvc = new(svc.OctoService)
 
-	RootCmd.AddCommand(homeCmd)
 	RootCmd.AddCommand(serverCmd)
 	RootCmd.AddCommand(toolStateCmd)
 	RootCmd.AddCommand(uploadFileCmd)
 	RootCmd.AddCommand(listFilesCmd)
 	RootCmd.AddCommand(getToolTempCmd)
-	RootCmd.AddCommand(printFileCmd)
 }
