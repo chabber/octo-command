@@ -11,6 +11,7 @@ require (
 
 require (
 	github.com/c-bata/go-prompt v0.2.6 // indirect
+	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jcelliott/lumber v0.0.0-20160324203708-dd349441af25 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect

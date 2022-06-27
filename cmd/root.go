@@ -1,11 +1,12 @@
 package cmd
 
 import (
-	"fmt"
-	"octo-command/octo/data"
-	"os"
+	"go/printer"
+	"octo-command/cmd/server"
+	"octo-command/octo/services"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/cobra/cmd"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -15,33 +16,19 @@ var RootCmd = &cobra.Command{
 	Long:          `A command line interface for interacting with OctoPrint`,
 	SilenceErrors: true,
 	SilenceUsage:  false,
-	Run:           onboard,
-}
-
-func onboard(cmd *cobra.Command, args []string) {
-	fmt.Println("Welcomd to OctoCommand!")
-	// attempt to load config
-	// if not found, force user through onboarding
-	c, _ := data.GetConfig()
-
-	// if found, we are done and leave user at the prompt
-	if c != nil {
-		return
-	}
-
-	fmt.Println()
-	fmt.Println("First off, there are a few pieces of information needed about your printer and server.")
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	fmt.Println("in execute()")
-	err := RootCmd.Execute()
-	if err != nil {
-		fmt.Print("exiting!!!!")
-		os.Exit(1)
-	}
+func Execute(pSvc services.PrinterService, sSvc services.SettingsService) error {
+	registerCommands(pSvc, sSvc)
+
+	return cmd.Execute()
+}
+
+func registerCommands(pSvc services.PrinterService, sSvc services.SettingsService) {
+	cmd.AddCommand(server.NewCmd(sSvc))
+	cmd.AddCommand(printer.NewCmd(pSvc))
 }
 
 func init() {

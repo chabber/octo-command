@@ -1,14 +1,6 @@
 package cmd
 
-import (
-	"fmt"
-	"log"
-	"time"
-
-	"github.com/spf13/cobra"
-)
-
-var getBedTempCmd = &cobra.Command{
+/*var getBedTempCmd = &cobra.Command{
 	Use:   "getbedtemp",
 	Short: "Get bed temp",
 	Long:  "Retrieve bed temperature from OctoPrint server",
@@ -44,4 +36,4 @@ var getBedTempCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(getBedTempCmd)
-}
+}*/

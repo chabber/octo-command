@@ -1,14 +1,7 @@
 package cmd
 
-import (
-	"fmt"
-	"octo-command/octo"
-	"strconv"
-
-	"github.com/spf13/cobra"
-)
-
 // connectCmd represents the start command
+/*
 var addTempCmd = &cobra.Command{
 	Use:   "addtemp [name] [bed_temp] [tool_temp]",
 	Short: "Add temp profile",
@@ -45,4 +38,4 @@ var addTempCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(addTempCmd)
-}
+}*/

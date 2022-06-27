@@ -1,14 +1,5 @@
 package cmd
 
-import (
-	"fmt"
-	"strconv"
-	"strings"
-	"time"
-
-	"github.com/spf13/cobra"
-)
-
 const (
 	LINE_UP     string = "\033[1A"
 	LINE_CLEAR  string = "\x1b[2K"
@@ -16,7 +7,7 @@ const (
 	SHOW_CURSOR string = "\033[?25h"
 )
 
-var flagBedTemp, flagToolTemp, flagTempProfile string
+/*var flagBedTemp, flagToolTemp, flagTempProfile string
 
 // connectCmd represents the start command
 var tempCmd = &cobra.Command{
@@ -101,4 +92,4 @@ func init() {
 	tempCmd.AddCommand(monitorSubCmd)
 	tempCmd.AddCommand(setSubCmd)
 	RootCmd.AddCommand(tempCmd)
-}
+}*/

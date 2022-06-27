@@ -1,4 +1,4 @@
-package data
+package printer
 
 import (
 	"errors"
@@ -10,17 +10,17 @@ import (
 	"github.com/chabber/go-octoprint"
 )
 
-type octoDataService struct {
+type octoServerService struct {
 	client *octoprint.Client
 }
 
-func NewOctoDataPort(c *octoprint.Client) octoDataService {
-	return octoDataService{
+func NewOctoServerPort(c *octoprint.Client) *octoServerService {
+	return &octoServerService{
 		client: c,
 	}
 }
 
-func (os *octoDataService) PrintFile(f string) error {
+func (os *octoServerService) PrintFile(f string) error {
 	if os.client == nil {
 		return errors.New("error: not connected to OctoPrint server")
 	}
@@ -38,7 +38,7 @@ func (os *octoDataService) PrintFile(f string) error {
 	return nil
 }
 
-func (os *octoDataService) GetToolTemp() ([]*models.Temperature, error) {
+func (os *octoServerService) GetToolTemp() ([]*models.Temperature, error) {
 	if os.client == nil {
 		return nil, errors.New("error: not connected to OctoPrint server")
 	}
@@ -67,7 +67,7 @@ func (os *octoDataService) GetToolTemp() ([]*models.Temperature, error) {
 	return temps, nil
 }
 
-func (os *octoDataService) GetBedTemp() (*models.Temperature, error) {
+func (os *octoServerService) GetBedTemp() (*models.Temperature, error) {
 	if os.client == nil {
 		return nil, errors.New("error: not connected to OctoPrint server")
 	}
@@ -93,7 +93,7 @@ func (os *octoDataService) GetBedTemp() (*models.Temperature, error) {
 	return t, nil
 }
 
-func (osvc *octoDataService) UploadFile(src string, dst string) {
+func (osvc *octoServerService) UploadFile(src string, dst string) {
 	if osvc.client == nil {
 		fmt.Println("Not connected to OctoPrint server")
 		return
@@ -124,7 +124,7 @@ func (osvc *octoDataService) UploadFile(src string, dst string) {
 	}
 }
 
-func (os *octoDataService) ToolState() {
+func (os *octoServerService) ToolState() {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
 		return
@@ -140,12 +140,8 @@ func (os *octoDataService) ToolState() {
 		log.Printf("Error getting tool state: %s", err)
 	}
 }
-func (os *octoDataService) GetFiles(dir string) {
-	if os.client == nil {
-		fmt.Println("Not connected to OctoPrint service")
-		return
-	}
 
+func (os *octoServerService) GetFiles(dir string) []models.FileInformation {
 	r := octoprint.FilesRequest{
 		Location:  octoprint.Local,
 		Recursive: true,
@@ -155,38 +151,33 @@ func (os *octoDataService) GetFiles(dir string) {
 		log.Printf("Error connecting to OctoPrint: %s", err)
 	}
 
-	printFileList(resp.Files, 0)
+	results := getFileInfo(resp.Files)
+
+	return results
 }
 
-func printFileList(f []*octoprint.FileInformation, level int) {
-	var indent string = ""
-	for x := 0; x < level; x++ {
-		indent = indent + "   "
-	}
+// Extract and convert octoprint file structure to my own
+func getFileInfo(fResp []*octoprint.FileInformation) []models.FileInformation {
+	var files []models.FileInformation
 
-	for _, f := range f {
+	for _, f := range fResp {
+		var file models.FileInformation
+		file.Name = f.Name
+		file.IsFolder = f.IsFolder()
+		files = append(files, file)
 		if f.IsFolder() {
-			fmt.Printf("%s[%s]\n", indent, f.Name)
-			printFileList(f.Children, level+1)
-		} else {
-			fmt.Printf("%s%s\n", indent, f.Name)
+			file.Children = getFileInfo(f.Children)
 		}
 	}
+
+	return files
 }
 
-func (os *octoDataService) Connect(s *models.ServerProfile) (state *string, err error) {
-	os.client = octoprint.NewClient(s.Url, s.ApiKey)
-
-	r := octoprint.ConnectionRequest{}
-	resp, err := r.Do(os.client)
-	if err != nil {
-		return nil, err
-	}
-
-	return (*string)(&resp.Current.State), nil
+func (os *octoServerService) Connect(s models.ServerProfile) (state *string, err error) {
+	return nil, nil
 }
 
-func (os *octoDataService) Home() {
+func (os *octoServerService) Home() {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
 		return
@@ -197,7 +188,7 @@ func (os *octoDataService) Home() {
 	r.Do(os.client)
 }
 
-func (os *octoDataService) SetBedTemp(t float64) {
+func (os *octoServerService) SetBedTemp(t float64) {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
 		return
@@ -208,7 +199,7 @@ func (os *octoDataService) SetBedTemp(t float64) {
 	r.Do(os.client)
 }
 
-func (os *octoDataService) SetToolTemp(t float64) {
+func (os *octoServerService) SetToolTemp(t float64) {
 	if os.client == nil {
 		fmt.Println("Not connected to OctoPrint service")
 		return

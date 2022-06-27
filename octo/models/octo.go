@@ -28,4 +28,5 @@ type Config struct {
 type FileInformation struct {
 	Name     string
 	Children []FileInformation
+	IsFolder bool
 }

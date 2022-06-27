@@ -1,9 +1,8 @@
 package data
 
 import (
-	"encoding/json"
 	"fmt"
-	"octo-command/octo/db"
+	ds "octo-command/infrastructure/datastore"
 	"octo-command/octo/models"
 	"octo-command/octo/ports"
 
@@ -18,14 +17,15 @@ const (
 )
 
 type storageDataService struct {
-	db db.DatabasePort
+	db ds.DatabasePort
 }
 
-func NewStorageDataPort(d db.DatabasePort) ports.StorageDataPort {
+func NewStorageDataPort(d ds.DatabasePort) ports.StorageDataPort {
 	return &storageDataService{
 		db: d,
 	}
 }
+
 func (sds *storageDataService) GetConfig() (*models.Config, error) {
 	db, err := scribble.New(".", nil)
 	if err != nil {
@@ -41,12 +41,22 @@ func (sds *storageDataService) GetConfig() (*models.Config, error) {
 	return &rec, nil
 }
 
-func (sds *storageDataService) SaveServerProfile(s models.ServerProfile) {
-	sds.db.Save(SERVER_PROFILE_COLLECTION, s.Name, s)
+func (sds *storageDataService) SaveServerProfile(s models.ServerProfile) error {
+	return sds.db.Save(SERVER_PROFILE_COLLECTION, s.Name, s)
 }
 
 func (sds *storageDataService) GetServerProfile(n string) (*models.ServerProfile, error) {
-	db, err := scribble.New(".", nil)
+	var p models.ServerProfile
+
+	err := sds.db.Get(n, SERVER_PROFILE_COLLECTION, p)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &p, nil
+
+	/*db, err := scribble.New(".", nil)
 	if err != nil {
 		fmt.Println("Error", err)
 		return nil, err
@@ -58,23 +68,16 @@ func (sds *storageDataService) GetServerProfile(n string) (*models.ServerProfile
 		return nil, fmt.Errorf("error loading profile")
 	}
 
-	return rec, nil
+	return rec, nil*/
 }
 
 func (sds *storageDataService) GetServerProfiles() []models.ServerProfile {
-	db, err := scribble.New(".", nil)
-	if err != nil {
-		fmt.Println("Error", err)
-	}
+	var ps []interface{}
+	sds.db.GetAll(SERVER_PROFILE_COLLECTION, ps)
 
 	var profiles []models.ServerProfile
-
-	ps, _ := db.ReadAll(SERVER_PROFILE_COLLECTION)
 	for _, p := range ps {
-		var profile models.ServerProfile
-		json.Unmarshal([]byte(p), &profile)
-
-		profiles = append(profiles, profile)
+		profiles = append(profiles, p.(models.ServerProfile))
 	}
 
 	return profiles
@@ -96,7 +99,7 @@ func (sds *storageDataService) GetDefaultServerProfile() (*models.ServerProfile,
 	return defaultProfile, nil
 }
 
-func (sds *storageDataService) DeleteServerProfile(n string) (err error) {
+func (sds *storageDataService) DeleteServerProfile(n string) error {
 	db, err := scribble.New(".", nil)
 	if err != nil {
 		fmt.Println("Error", err)
