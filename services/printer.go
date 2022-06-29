@@ -2,7 +2,7 @@ package services
 
 import (
 	"octo-command/infrastructure/printer"
-	"octo-command/octo/models"
+	"octo-command/models"
 )
 
 type PrinterService struct {

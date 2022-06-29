@@ -1,8 +1,8 @@
 package services
 
 import (
-	"octo-command/octo/models"
-	"octo-command/octo/ports"
+	"octo-command/models"
+	"octo-command/ports"
 )
 
 type SettingsService struct {
@@ -49,4 +49,8 @@ func (ss *SettingsService) GetServerProfiles() []models.ServerProfile {
 
 func (ss *SettingsService) GetTempProfile(n string) models.TempProfile {
 	return ss.sdp.GetTempProfile(n)
+}
+
+func (ss *SettingsService) GetTempProfiles() models.TempProfile {
+	return ss.sdp.GetTempProfiles()
 }

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"octo-command/octo/models"
+	"octo-command/models"
 	"os"
 
 	"github.com/chabber/go-octoprint"

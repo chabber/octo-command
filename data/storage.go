@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 	ds "octo-command/infrastructure/datastore"
+	"octo-command/models"
 	"octo-command/octo/models"
 	"octo-command/octo/ports"
 
@@ -133,4 +134,16 @@ func (sds *storageDataService) GetTempProfile(n string) models.TempProfile {
 	db.Read("TEMP_PROFILE_STORE", n, &rec)
 
 	return rec
+}
+
+func (sds *storageDataService) GetTempProfiles() []models.TempProfile {
+	var ps []interface{}
+	sds.db.GetAll(TEMP_PROFILE_COLLECTION, ps)
+
+	var profiles []models.TempProfile
+	for _, p := range ps {
+		profiles = append(profiles, p.(models.TempProfile))
+	}
+
+	return profiles
 }

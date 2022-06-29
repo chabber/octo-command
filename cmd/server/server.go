@@ -2,10 +2,8 @@ package server
 
 import (
 	"fmt"
-	"octo-command/cmd"
-	"octo-command/octo/models"
-	"octo-command/octo/services"
-	"strings"
+	"octo-command/cmd/util"
+	"octo-command/services"
 
 	"github.com/spf13/cobra"
 )
@@ -23,15 +21,6 @@ func NewCmd(svc services.SettingsService) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
-
-	saveSubCmd := &cobra.Command{
-		Use:   "save [name] [url] [api_key]",
-		Short: "Save/update an OctoPrint server profile",
-		Args:  cobra.ExactArgs(3),
-		Run:   runSaveSubCmd(svc),
-	}
-	saveSubCmd.Flags().BoolVarP(&flagServerDefault, "default", "d", false, "Set profile as default")
-	serverCmd.AddCommand(saveSubCmd)
 
 	listSubCmd := &cobra.Command{
 		Use:   "list",
@@ -52,59 +41,12 @@ func NewCmd(svc services.SettingsService) *cobra.Command {
 	return serverCmd
 }
 
-func runDeleteSubCmd(svc services.SettingsService) cmd.RunFunc {
+func runDeleteSubCmd(svc services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
 		err := svc.DeleteServerProfile(args[0])
 		if err != nil {
 			fmt.Printf("Error deleting profile: %s", err)
 		}
-	}
-}
-
-func runListSubCmd(svc services.SettingsService) cmd.RunFunc {
-	return func(cmd *cobra.Command, args []string) {
-		profiles := svc.GetServerProfiles()
-
-		// if long listing, print column headers
-		if flagLongList {
-			fmt.Printf("%-15s | %-25s | %-30s | %-7s\n", "Name", "URL", "API Key", "Default")
-			fmt.Printf("%-15s+%-25s+%-30s+%-7s\n", strings.Repeat("-", 16), strings.Repeat("-", 27), strings.Repeat("-", 32), strings.Repeat("-", 8))
-		}
-
-		// print formatted list of profiles
-		for _, p := range profiles {
-			if flagLongList {
-				fmt.Printf("%-15s | %-25s | %-30s | %-7v\n", p.Name, p.Url, p.ApiKey, p.Default)
-			} else {
-				fmt.Printf("%s\n", p.Name)
-			}
-		}
-	}
-}
-
-func runSaveSubCmd(svc services.SettingsService) cmd.RunFunc {
-	return func(cmd *cobra.Command, args []string) {
-		newProfile := models.ServerProfile{
-			Name:    args[0],
-			Url:     args[1],
-			ApiKey:  args[2],
-			Default: flagServerDefault,
-		}
-
-		// if setting this profile as default, must make sure no other profiles are marked as default already
-		// if there is, remove as default
-		if newProfile.Default {
-			currentProfiles := svc.GetServerProfiles()
-			for _, p := range currentProfiles {
-				if p.Default {
-					p.Default = false
-					svc.SaveServerProfile(p)
-					break
-				}
-			}
-		}
-
-		svc.SaveServerProfile(newProfile)
 	}
 }
 

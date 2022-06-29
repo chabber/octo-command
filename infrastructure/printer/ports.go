@@ -1,6 +1,6 @@
 package printer
 
-import "octo-command/octo/models"
+import "octo-command/models"
 
 // Interface to OctoPrint server
 type PrinterDataPort interface {

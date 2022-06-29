@@ -1,6 +1,6 @@
 package ports
 
-import "octo-command/octo/models"
+import "octo-command/models"
 
 // Local storage used by the command line tool
 type StorageDataPort interface {
@@ -16,4 +16,5 @@ type StorageDataPort interface {
 	// temperature profiles
 	SaveTempProfile(models.TempProfile)
 	GetTempProfile(string) models.TempProfile
+	GetTempProfiles() []models.TempProfile
 }
