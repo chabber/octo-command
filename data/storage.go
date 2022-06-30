@@ -3,9 +3,8 @@ package data
 import (
 	"fmt"
 	ds "octo-command/infrastructure/datastore"
-	"octo-command/models"
 	"octo-command/octo/models"
-	"octo-command/octo/ports"
+	"octo-command/ports"
 
 	scribble "github.com/nanobox-io/golang-scribble"
 )
@@ -131,9 +130,13 @@ func (sds *storageDataService) GetTempProfile(n string) models.TempProfile {
 	}
 
 	rec := models.TempProfile{}
-	db.Read("TEMP_PROFILE_STORE", n, &rec)
+	db.Read(TEMP_PROFILE_COLLECTION, n, &rec)
 
 	return rec
+}
+
+func (sds *storageDataService) DeleteTempProfile(n string) error {
+	return sds.db.Delete(TEMP_PROFILE_COLLECTION, n)
 }
 
 func (sds *storageDataService) GetTempProfiles() []models.TempProfile {

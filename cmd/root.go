@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"go/printer"
-	"octo-command/cmd/server"
-	"octo-command/octo/services"
+	"octo-command/services"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/cobra/cobra/cmd"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -23,12 +20,12 @@ var RootCmd = &cobra.Command{
 func Execute(pSvc services.PrinterService, sSvc services.SettingsService) error {
 	registerCommands(pSvc, sSvc)
 
-	return cmd.Execute()
+	return RootCmd.Execute()
 }
 
 func registerCommands(pSvc services.PrinterService, sSvc services.SettingsService) {
-	cmd.AddCommand(server.NewCmd(sSvc))
-	cmd.AddCommand(printer.NewCmd(pSvc))
+	RootCmd.AddCommand(NewAddCmd(sSvc))
+	RootCmd.AddCommand(NewDeleteCmd(sSvc))
 }
 
 func init() {

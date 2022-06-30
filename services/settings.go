@@ -51,6 +51,10 @@ func (ss *SettingsService) GetTempProfile(n string) models.TempProfile {
 	return ss.sdp.GetTempProfile(n)
 }
 
-func (ss *SettingsService) GetTempProfiles() models.TempProfile {
+func (ss *SettingsService) GetTempProfiles() []models.TempProfile {
 	return ss.sdp.GetTempProfiles()
+}
+
+func (ss *SettingsService) DeleteTempProfile(n string) error {
+	return ss.sdp.DeleteTempProfile(n)
 }

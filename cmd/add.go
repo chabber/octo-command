@@ -1,8 +1,9 @@
-package add
+package cmd
 
 import (
 	"fmt"
 	"octo-command/cmd/util"
+	consts "octo-command/domain"
 	"octo-command/models"
 	"octo-command/services"
 	"strconv"
@@ -12,7 +13,7 @@ import (
 
 var flagServerDefault bool
 
-func NewCmd(svc services.SettingsService) *cobra.Command {
+func NewAddCmd(svc services.SettingsService) *cobra.Command {
 	addCmd := &cobra.Command{
 		Use:   "add",
 		Short: "Command for managing server and temp profiles",
@@ -49,8 +50,8 @@ func runAddTempSubCmd(svc services.SettingsService) util.RunFunc {
 			fmt.Println("Bed temperature must be a valid number.")
 			return
 		}
-		if bedTemp > octo.MAX_BED_TEMPERATURE {
-			fmt.Println("Temperature exceeds max bed temperature of ", MAX_BED_TEMPERATURE)
+		if bedTemp > consts.MAX_BED_TEMPERATURE {
+			fmt.Println("Temperature exceeds max bed temperature of ", consts.MAX_BED_TEMPERATURE)
 		}
 
 		// validate tool temperature
@@ -59,8 +60,8 @@ func runAddTempSubCmd(svc services.SettingsService) util.RunFunc {
 			fmt.Println("Tool temperature must be a valid number.L ", err)
 			return
 		}
-		if toolTemp > octo.MAX_TOOL_TEMPERATURE {
-			fmt.Println("Temperature exceeds max tool temperature of ", MAX_TOOL_TEMPERATURE)
+		if toolTemp > consts.MAX_TOOL_TEMPERATURE {
+			fmt.Println("Temperature exceeds max tool temperature of ", consts.MAX_TOOL_TEMPERATURE)
 			return
 		}
 

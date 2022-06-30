@@ -1,4 +1,4 @@
-package list
+package cmd
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 
 var flagLongList bool
 
-func NewCmd(svc services.SettingsService) *cobra.Command {
+func NewListCmd(svc services.SettingsService) *cobra.Command {
 	listCmd := &cobra.Command{
 		Use:   "list {server | temp}",
 		Short: "List saved servers or temperature profiles",
@@ -31,6 +31,7 @@ func NewCmd(svc services.SettingsService) *cobra.Command {
 		Short: "List temperature profiles",
 		Run:   runListTempsSubCmd(svc),
 	}
+	listCmd.AddCommand(listTempsSubCmd)
 
 	return listCmd
 }

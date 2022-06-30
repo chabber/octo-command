@@ -17,4 +17,5 @@ type StorageDataPort interface {
 	SaveTempProfile(models.TempProfile)
 	GetTempProfile(string) models.TempProfile
 	GetTempProfiles() []models.TempProfile
+	DeleteTempProfile(string) error
 }
