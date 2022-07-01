@@ -19,3 +19,14 @@ type Temperature struct {
 	Target float64
 	Offset float64
 }
+
+type Config struct {
+	NumHotEnds int
+	Onboarded  bool
+}
+
+type FileInformation struct {
+	Name     string
+	Children []FileInformation
+	IsFolder bool
+}

@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"octo-command/services"
 
 	"github.com/spf13/cobra"
 )
@@ -18,12 +17,16 @@ var RootCmd = &cobra.Command{
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := RootCmd.Execute()
-	if err != nil {
-		fmt.Print("exiting!!!!")
-		os.Exit(1)
-	}
+func Execute(pSvc services.PrinterService, sSvc services.SettingsService) error {
+	registerCommands(pSvc, sSvc)
+
+	return RootCmd.Execute()
+}
+
+func registerCommands(pSvc services.PrinterService, sSvc services.SettingsService) {
+	RootCmd.AddCommand(NewAddCmd(sSvc))
+	RootCmd.AddCommand(NewDeleteCmd(sSvc))
+	RootCmd.AddCommand(NewListCmd(sSvc))
 }
 
 func init() {
