@@ -22,8 +22,8 @@ func NewAddCmd(svc services.SettingsService) *cobra.Command {
 	}
 
 	addServerSubCmd := &cobra.Command{
-		Use:   "add server",
-		Short: "Add server profile",
+		Use:   "add printer",
+		Short: "Add printer profile",
 		Run:   runAddServerSubCmd(svc),
 	}
 	addServerSubCmd.Flags().BoolVarP(&flagServerDefault, "default", "d", false, "Set profile as default")
@@ -77,7 +77,7 @@ func runAddTempSubCmd(svc services.SettingsService) util.RunFunc {
 
 func runAddServerSubCmd(svc services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
-		newProfile := models.ServerProfile{
+		newProfile := models.PrinterProfile{
 			Name:    args[0],
 			Url:     args[1],
 			ApiKey:  args[2],
@@ -87,16 +87,21 @@ func runAddServerSubCmd(svc services.SettingsService) util.RunFunc {
 		// if setting this profile as default, must make sure no other profiles are marked as default already
 		// if there is, remove as default
 		if newProfile.Default {
-			currentProfiles := svc.GetServerProfiles()
+			currentProfiles, err := svc.GetPrinterProfiles()
+
+			if err != nil {
+				fmt.Println("error getting server profiles to update to non-default: %v", err)
+				return
+			}
 			for _, p := range currentProfiles {
 				if p.Default {
 					p.Default = false
-					svc.SaveServerProfile(p)
+					svc.SavePrinterProfile(p)
 					break
 				}
 			}
 		}
 
-		svc.SaveServerProfile(newProfile)
+		svc.SavePrinterProfile(newProfile)
 	}
 }

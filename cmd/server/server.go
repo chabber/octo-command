@@ -9,15 +9,15 @@ var connectSubCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var status *string
 		var err error
-		var profile *models.ServerProfile
+		var profile *models.PrinterProfile
 
 		useDefault := len(args) == 0
 
 		// load profile based on if user specified to use default or not
 		if useDefault {
-			profile, err = octoSvc.GetDefaultServerProfile()
+			profile, err = octoSvc.GetDefaultPrinterProfile()
 		} else {
-			profile, err = octoSvc.GetServerProfile(args[0])
+			profile, err = octoSvc.GetPrinterProfile(args[0])
 		}
 
 		// if any errors loading profile (does not include not finding the profile)

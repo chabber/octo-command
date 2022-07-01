@@ -37,7 +37,7 @@ func NewDeleteCmd(svc services.SettingsService) *cobra.Command {
 
 func runDeleteServerSubCmd(svc services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
-		svc.DeleteServerProfile(args[0])
+		svc.DeletePrinterProfile(args[0])
 	}
 }
 

@@ -1,4 +1,4 @@
-package ports
+package data
 
 import "octo-command/models"
 
@@ -9,13 +9,12 @@ type StorageDataPort interface {
 	// server profiles
 	SavePrinterProfile(models.PrinterProfile) error
 	GetPrinterProfile(name string) (*models.PrinterProfile, error)
-	GetPrinterProfiles() []models.PrinterProfile
-	GetDefaultPrinterProfile() (*models.PrinterProfile, error)
+	GetPrinterProfiles() ([]models.PrinterProfile, error)
 	DeletePrinterProfile(string) error
 
 	// temperature profiles
-	SaveTempProfile(models.TempProfile)
-	GetTempProfile(string) models.TempProfile
-	GetTempProfiles() []models.TempProfile
+	SaveTempProfile(models.TempProfile) error
+	GetTempProfile(string) (models.TempProfile, error)
+	GetTempProfiles() ([]models.TempProfile, error)
 	DeleteTempProfile(string) error
 }
