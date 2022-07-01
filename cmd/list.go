@@ -24,6 +24,7 @@ func NewListCmd(svc services.SettingsService) *cobra.Command {
 		Short: "List server profiles",
 		Run:   runListServerSubCmd(svc),
 	}
+	listServersSubCmd.Flags().BoolVarP(&flagLongList, "long", "l", false, "Show detailed listing")
 	listCmd.AddCommand(listServersSubCmd)
 
 	listTempsSubCmd := &cobra.Command{
@@ -31,6 +32,7 @@ func NewListCmd(svc services.SettingsService) *cobra.Command {
 		Short: "List temperature profiles",
 		Run:   runListTempsSubCmd(svc),
 	}
+	listTempsSubCmd.Flags().BoolVarP(&flagLongList, "long", "l", false, "Show detailed listing")
 	listCmd.AddCommand(listTempsSubCmd)
 
 	return listCmd
@@ -41,7 +43,16 @@ func runListTempsSubCmd(svc services.SettingsService) util.RunFunc {
 		profiles := svc.GetTempProfiles()
 
 		if flagLongList {
+			fmt.Printf("%-15s | %-25s | %-30s\n", "Name", "Bed Temp", "Tool Temp")
+			fmt.Printf("%-15s+%-25s+%-30s\n", strings.Repeat("-", 16), strings.Repeat("-", 27), strings.Repeat("-", 32))
+		}
 
+		for _, p := range profiles {
+			if flagLongList {
+				fmt.Printf("%-15s | %-25v | %-30v\n", p.Name, p.BedTemp, p.ToolTemp)
+			} else {
+				fmt.Printf("%s\n", p.Name)
+			}
 		}
 	}
 }

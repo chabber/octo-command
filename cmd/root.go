@@ -26,6 +26,7 @@ func Execute(pSvc services.PrinterService, sSvc services.SettingsService) error 
 func registerCommands(pSvc services.PrinterService, sSvc services.SettingsService) {
 	RootCmd.AddCommand(NewAddCmd(sSvc))
 	RootCmd.AddCommand(NewDeleteCmd(sSvc))
+	RootCmd.AddCommand(NewListCmd(sSvc))
 }
 
 func init() {

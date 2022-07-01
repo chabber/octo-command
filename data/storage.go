@@ -1,19 +1,10 @@
 package data
 
 import (
-	"fmt"
+	"octo-command/domain"
 	ds "octo-command/infrastructure/datastore"
-	"octo-command/octo/models"
+	"octo-command/models"
 	"octo-command/ports"
-
-	scribble "github.com/nanobox-io/golang-scribble"
-)
-
-const (
-	SERVER_PROFILE_COLLECTION string = ".store/server_profiles"
-	TEMP_PROFILE_COLLECTION   string = ".store/temp_profiles"
-	CONFIG_COLLECTION         string = ".store"
-	CONFIG_RESOURCE           string = "config"
 )
 
 type storageDataService struct {
@@ -27,53 +18,31 @@ func NewStorageDataPort(d ds.DatabasePort) ports.StorageDataPort {
 }
 
 func (sds *storageDataService) GetConfig() (*models.Config, error) {
-	db, err := scribble.New(".", nil)
-	if err != nil {
-		return nil, err
-	}
+	var config = models.Config{}
+	sds.db.Get(domain.CONFIG_RESOURCE, domain.CONFIG_COLLECTION, config)
 
-	rec := models.Config{}
-	err = db.Read(CONFIG_COLLECTION, CONFIG_RESOURCE, rec)
-	if err != nil {
-		return nil, err
-	}
-
-	return &rec, nil
+	return &config, nil
 }
 
 func (sds *storageDataService) SaveServerProfile(s models.ServerProfile) error {
-	return sds.db.Save(SERVER_PROFILE_COLLECTION, s.Name, s)
+	return sds.db.Save(domain.SERVER_PROFILE_COLLECTION, s.Name, s)
 }
 
 func (sds *storageDataService) GetServerProfile(n string) (*models.ServerProfile, error) {
 	var p models.ServerProfile
 
-	err := sds.db.Get(n, SERVER_PROFILE_COLLECTION, p)
+	err := sds.db.Get(n, domain.SERVER_PROFILE_COLLECTION, p)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &p, nil
-
-	/*db, err := scribble.New(".", nil)
-	if err != nil {
-		fmt.Println("Error", err)
-		return nil, err
-	}
-
-	rec := &models.ServerProfile{}
-	err = db.Read(SERVER_PROFILE_COLLECTION, n, rec)
-	if err != nil {
-		return nil, fmt.Errorf("error loading profile")
-	}
-
-	return rec, nil*/
 }
 
 func (sds *storageDataService) GetServerProfiles() []models.ServerProfile {
 	var ps []interface{}
-	sds.db.GetAll(SERVER_PROFILE_COLLECTION, ps)
+	sds.db.GetAll(domain.SERVER_PROFILE_COLLECTION, ps)
 
 	var profiles []models.ServerProfile
 	for _, p := range ps {
@@ -100,48 +69,29 @@ func (sds *storageDataService) GetDefaultServerProfile() (*models.ServerProfile,
 }
 
 func (sds *storageDataService) DeleteServerProfile(n string) error {
-	db, err := scribble.New(".", nil)
-	if err != nil {
-		fmt.Println("Error", err)
-		return err
-	}
-
-	err = db.Delete(SERVER_PROFILE_COLLECTION, n)
-	if err != nil {
-		return err
-	}
+	sds.db.Delete(domain.SERVER_PROFILE_COLLECTION, n)
 
 	return nil
 }
 
 func (sds *storageDataService) SaveTempProfile(s models.TempProfile) {
-	db, err := scribble.New(".", nil)
-	if err != nil {
-		fmt.Println("Error", err)
-	}
-
-	db.Write(TEMP_PROFILE_COLLECTION, s.Name, s)
+	sds.db.Save(s.Name, domain.TEMP_PROFILE_COLLECTION, s)
 }
 
 func (sds *storageDataService) GetTempProfile(n string) models.TempProfile {
-	db, err := scribble.New(".", nil)
-	if err != nil {
-		fmt.Println("Error", err)
-	}
-
 	rec := models.TempProfile{}
-	db.Read(TEMP_PROFILE_COLLECTION, n, &rec)
+	sds.db.Get(n, domain.TEMP_PROFILE_COLLECTION, rec)
 
 	return rec
 }
 
 func (sds *storageDataService) DeleteTempProfile(n string) error {
-	return sds.db.Delete(TEMP_PROFILE_COLLECTION, n)
+	return sds.db.Delete(domain.TEMP_PROFILE_COLLECTION, n)
 }
 
 func (sds *storageDataService) GetTempProfiles() []models.TempProfile {
 	var ps []interface{}
-	sds.db.GetAll(TEMP_PROFILE_COLLECTION, ps)
+	sds.db.GetAll(domain.TEMP_PROFILE_COLLECTION, ps)
 
 	var profiles []models.TempProfile
 	for _, p := range ps {
