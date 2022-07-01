@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"fmt"
 
 	scribble "github.com/nanobox-io/golang-scribble"
 )
@@ -22,21 +23,28 @@ func (s *scribbleDatabaseService) Get(resource string, collection string, obj in
 	return err
 }
 
-func (s *scribbleDatabaseService) GetAll(c string, r []interface{}) error {
+func (s *scribbleDatabaseService) GetAll(c string) ([]interface{}, error) {
 	records, err := s.db.ReadAll(c)
+	if err != nil {
+		fmt.Printf("error reading all from DB: %v", err)
+	}
+	fmt.Printf("records read from DB len: %v", len(records))
 
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	var r []interface{}
 
 	for _, record := range records {
 		var result interface{}
 		json.Unmarshal([]byte(record), &result)
+		fmt.Printf("found record: %v\n", result)
 
 		r = append(r, result)
 	}
 
-	return nil
+	return r, nil
 }
 
 func (s *scribbleDatabaseService) Save(resource string, collection string, obj interface{}) error {

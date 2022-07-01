@@ -14,7 +14,7 @@ type octoServerService struct {
 	client *octoprint.Client
 }
 
-func NewOctoServerPort(c *octoprint.Client) *octoServerService {
+func NewOctoServerService(c *octoprint.Client) *octoServerService {
 	return &octoServerService{
 		client: c,
 	}
@@ -173,8 +173,16 @@ func getFileInfo(fResp []*octoprint.FileInformation) []models.FileInformation {
 	return files
 }
 
-func (os *octoServerService) Connect(s models.ServerProfile) (state *string, err error) {
-	return nil, nil
+func (os *octoServerService) Connect(s models.PrinterProfile) (state *string, err error) {
+	os.client = octoprint.NewClient(s.Url, s.ApiKey)
+
+	r := octoprint.ConnectionRequest{}
+	resp, err := r.Do(os.client)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*string)(&resp.Current.State), nil
 }
 
 func (os *octoServerService) Home() {

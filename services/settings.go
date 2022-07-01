@@ -1,60 +1,76 @@
 package services
 
 import (
+	"octo-command/data"
 	"octo-command/models"
-	"octo-command/ports"
 )
 
-type SettingsService struct {
-	sdp ports.StorageDataPort
+type settingsService struct {
+	sdp data.StorageDataPort
 }
 
-func NewSettingsService(data ports.StorageDataPort) SettingsService {
-	return SettingsService{
+func NewSettingsService(data data.StorageDataPort) SettingsService {
+	return &settingsService{
 		sdp: data,
 	}
 }
 
-func (os *SettingsService) GetConfig() error {
-	os.sdp.GetConfig()
+func (ss settingsService) GetConfig() (*models.Config, error) {
+	c, _ := ss.sdp.GetConfig()
 
-	return nil
+	return c, nil
 }
 
-func (os *SettingsService) SaveTempProfile(t models.TempProfile) error {
-	os.sdp.SaveTempProfile(t)
-
-	return nil
+func (ss settingsService) SavePrinterProfile(p models.PrinterProfile) error {
+	return ss.sdp.SavePrinterProfile(p)
 }
 
-func (ss *SettingsService) SaveServerProfile(p models.ServerProfile) {
-	ss.sdp.SaveServerProfile(p)
+func (ss settingsService) GetPrinterProfile(n string) (*models.PrinterProfile, error) {
+	return ss.sdp.GetPrinterProfile(n)
 }
 
-func (ss *SettingsService) GetDefaultServerProfile() (*models.ServerProfile, error) {
-	return ss.sdp.GetDefaultServerProfile()
+func (ss settingsService) GetPrinterProfiles() ([]models.PrinterProfile, error) {
+	p, err := ss.sdp.GetPrinterProfiles()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
 }
 
-func (ss *SettingsService) GetServerProfile(n string) (*models.ServerProfile, error) {
-	return ss.sdp.GetServerProfile(n)
+func (ss settingsService) GetDefaultPrinterProfile() (*models.PrinterProfile, error) {
+	profiles, err := ss.sdp.GetPrinterProfiles()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range profiles {
+		if p.Default {
+			return &p, nil
+		}
+	}
+
+	return nil, nil
 }
 
-func (ss *SettingsService) DeleteServerProfile(n string) error {
-	return ss.sdp.DeleteServerProfile(n)
+func (ss settingsService) DeletePrinterProfile(n string) error {
+	return ss.sdp.DeletePrinterProfile(n)
 }
 
-func (ss *SettingsService) GetServerProfiles() []models.ServerProfile {
-	return ss.sdp.GetServerProfiles()
+func (ss settingsService) SaveTempProfile(t models.TempProfile) {
+	ss.sdp.SaveTempProfile(t)
 }
 
-func (ss *SettingsService) GetTempProfile(n string) models.TempProfile {
+func (ss settingsService) GetTempProfile(n string) (models.TempProfile, error) {
 	return ss.sdp.GetTempProfile(n)
 }
 
-func (ss *SettingsService) GetTempProfiles() []models.TempProfile {
+func (ss settingsService) GetTempProfiles() ([]models.TempProfile, error) {
 	return ss.sdp.GetTempProfiles()
 }
 
-func (ss *SettingsService) DeleteTempProfile(n string) error {
+func (ss settingsService) DeleteTempProfile(n string) error {
 	return ss.sdp.DeleteTempProfile(n)
 }

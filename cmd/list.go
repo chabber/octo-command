@@ -20,7 +20,7 @@ func NewListCmd(svc services.SettingsService) *cobra.Command {
 	}
 
 	listServersSubCmd := &cobra.Command{
-		Use:   "list server",
+		Use:   "server",
 		Short: "List server profiles",
 		Run:   runListServerSubCmd(svc),
 	}
@@ -28,7 +28,7 @@ func NewListCmd(svc services.SettingsService) *cobra.Command {
 	listCmd.AddCommand(listServersSubCmd)
 
 	listTempsSubCmd := &cobra.Command{
-		Use:   "list temp",
+		Use:   "temp",
 		Short: "List temperature profiles",
 		Run:   runListTempsSubCmd(svc),
 	}
@@ -40,8 +40,11 @@ func NewListCmd(svc services.SettingsService) *cobra.Command {
 
 func runListTempsSubCmd(svc services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
-		profiles := svc.GetTempProfiles()
-
+		profiles, err := svc.GetTempProfiles()
+		if err != nil {
+			fmt.Println("error retrieving temperature profiles: %v", err)
+			return
+		}
 		if flagLongList {
 			fmt.Printf("%-15s | %-25s | %-30s\n", "Name", "Bed Temp", "Tool Temp")
 			fmt.Printf("%-15s+%-25s+%-30s\n", strings.Repeat("-", 16), strings.Repeat("-", 27), strings.Repeat("-", 32))
@@ -59,7 +62,12 @@ func runListTempsSubCmd(svc services.SettingsService) util.RunFunc {
 
 func runListServerSubCmd(svc services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
-		profiles := svc.GetServerProfiles()
+		profiles, err := svc.GetPrinterProfiles()
+
+		if err != nil {
+			fmt.Println("error retrieving server profiles: %v", err)
+			return
+		}
 
 		// if long listing, print column headers
 		if flagLongList {
