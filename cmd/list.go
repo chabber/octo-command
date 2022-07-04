@@ -42,7 +42,7 @@ func runListTempsSubCmd(svc services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
 		profiles, err := svc.GetTempProfiles()
 		if err != nil {
-			fmt.Println("error retrieving temperature profiles: %v", err)
+			fmt.Printf("error retrieving temperature profiles: %v\n", err)
 			return
 		}
 		if flagLongList {
@@ -65,7 +65,7 @@ func runListServerSubCmd(svc services.SettingsService) util.RunFunc {
 		profiles, err := svc.GetPrinterProfiles()
 
 		if err != nil {
-			fmt.Println("error retrieving server profiles: %v", err)
+			fmt.Printf("error retrieving server profiles: %v\n", err)
 			return
 		}
 

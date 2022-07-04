@@ -27,6 +27,7 @@ func runConnectCmd(ps *services.PrinterService, ss services.SettingsService) uti
 		var err error
 		var profile *models.PrinterProfile
 
+		// if no profile arguemnt was passed, we will try to use a default profile
 		useDefault := len(args) == 0
 		// load profile based on if user specified to use default or not
 		if useDefault {
@@ -61,6 +62,8 @@ func runConnectCmd(ps *services.PrinterService, ss services.SettingsService) uti
 			fmt.Printf("Error connecting to server: %s\n", err)
 			return
 		}
+
+		ps.Connected = true
 
 		fmt.Printf("Connection status: %s\n", *status)
 	}
