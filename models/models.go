@@ -7,21 +7,21 @@ import "octo-command/domain"
 // type of printer.
 type PrinterProfile struct {
 	// common values
-	Name    string
-	Type    domain.PrinterCommType
-	Default bool
+	Name    string                 `json:"Name"`
+	Type    domain.PrinterCommType `json:"Type"`
+	Default bool                   `json:"Default"`
 
-	// Octo Print values
-	Url    string
-	ApiKey string
+	// octo print values
+	Url    string `json:"Url"`
+	ApiKey string `json:"ApiKey"`
 
 	// Direct values
 }
 
 type TempProfile struct {
-	Name     string  `json: "Name"`
-	BedTemp  float64 `json: "BedTemp"`
-	ToolTemp float64 `json: "ToolTemp"`
+	Name     string  `json:"Name"`
+	BedTemp  float64 `json:"BedTemp"`
+	ToolTemp float64 `json:"ToolTemp"`
 }
 
 type Temperature struct {

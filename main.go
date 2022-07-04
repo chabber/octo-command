@@ -30,6 +30,7 @@ func main() {
 	settingsSvc = services.NewSettingsService(
 		data.NewScribbleDataService(),
 	)
+	printerSvc = services.NewPrinterService(nil)
 	cmd.Execute(printerSvc, settingsSvc)
 	simplePrompt.Run()
 }

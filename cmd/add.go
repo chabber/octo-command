@@ -8,6 +8,7 @@ import (
 	"octo-command/services"
 	"strconv"
 
+	"github.com/c-bata/go-prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -22,15 +23,15 @@ func NewAddCmd(svc services.SettingsService) *cobra.Command {
 	}
 
 	addServerSubCmd := &cobra.Command{
-		Use:   "add printer",
+		Use:   "printer",
 		Short: "Add printer profile",
-		Run:   runAddServerSubCmd(svc),
+		Run:   runAddPrinterSubCmd(svc),
 	}
 	addServerSubCmd.Flags().BoolVarP(&flagServerDefault, "default", "d", false, "Set profile as default")
 	addCmd.AddCommand(addServerSubCmd)
 
 	addTempSubCmd := &cobra.Command{
-		Use:   "add temp",
+		Use:   "temp",
 		Short: "Add temperature profile",
 		Run:   runAddTempSubCmd(svc),
 	}
@@ -75,14 +76,10 @@ func runAddTempSubCmd(svc services.SettingsService) util.RunFunc {
 	}
 }
 
-func runAddServerSubCmd(svc services.SettingsService) util.RunFunc {
+func runAddPrinterSubCmd(svc services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
-		newProfile := models.PrinterProfile{
-			Name:    args[0],
-			Url:     args[1],
-			ApiKey:  args[2],
-			Default: flagServerDefault,
-		}
+
+		newProfile := getProfileInfo()
 
 		// if setting this profile as default, must make sure no other profiles are marked as default already
 		// if there is, remove as default
@@ -103,5 +100,43 @@ func runAddServerSubCmd(svc services.SettingsService) util.RunFunc {
 		}
 
 		svc.SavePrinterProfile(newProfile)
+		fmt.Printf("Printer profile with name '%s' successfully saved.\n\n", newProfile.Name)
 	}
+}
+
+func getProfileInfo() models.PrinterProfile {
+	var profile models.PrinterProfile
+
+	profile.Name = prompt.Input("Printer name: ", completer)
+	var printerType string
+	for printerType != "1" {
+		printerType = prompt.Input("Printer type ('1' for OctoPrint): ", completer)
+		if printerType != "1" {
+			fmt.Println("Only OctoPrint is supported at this time")
+		}
+	}
+
+	switch printerType {
+	case "1":
+		{
+			profile.Url = prompt.Input("URL (do no include 'http://'): ", completer)
+			profile.ApiKey = prompt.Input("API Key: ", completer)
+			var def string
+			for def != "y" && def != "n" {
+				def = prompt.Input("Default (y/n): ", completer)
+				if def != "y" && def != "n" {
+					fmt.Println("Please enter y/n")
+				}
+			}
+			profile.Default = def == "y"
+			//profile.Type = consts.OCTO_PRINT
+		}
+	}
+
+	return profile
+}
+
+func completer(d prompt.Document) []prompt.Suggest {
+	s := []prompt.Suggest{}
+	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 }
