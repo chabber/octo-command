@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"octo-command/domain"
 	"octo-command/models"
 
@@ -14,7 +15,11 @@ type scribbleDataService struct {
 
 func NewScribbleDataService() StorageDataPort {
 	// storage service
-	db, _ := scribble.New(".", nil)
+	db, err := scribble.New(".", nil)
+
+	if err != nil {
+		fmt.Println("error getting scribble db driver: ", err)
+	}
 
 	// TODO: error handling
 	return &scribbleDataService{
@@ -34,9 +39,15 @@ func (sds *scribbleDataService) SavePrinterProfile(s models.PrinterProfile) erro
 }
 
 func (sds *scribbleDataService) GetPrinterProfile(n string) (*models.PrinterProfile, error) {
-	var p models.PrinterProfile
-	err := sds.data.Read(domain.SERVER_PROFILE_COLLECTION, n, p)
+	p := models.PrinterProfile{}
 
+	err := sds.data.Read(domain.SERVER_PROFILE_COLLECTION, n, &p)
+	if err != nil {
+		fmt.Println("error reading printer profile from db: ", err)
+		return nil, err
+	}
+	fmt.Println("getting profile for: ", n)
+	fmt.Println("profile: ", p.Url)
 	return &p, err
 }
 
