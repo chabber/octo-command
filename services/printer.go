@@ -6,7 +6,8 @@ import (
 )
 
 type PrinterService struct {
-	Pdp printer.PrinterDataPort
+	Pdp       printer.PrinterDataPort
+	Connected bool
 }
 
 func NewPrinterService(data printer.PrinterDataPort) *PrinterService {
