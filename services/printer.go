@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"octo-command/infrastructure/printer"
 	"octo-command/models"
 )
@@ -50,6 +51,12 @@ func (ps *PrinterService) Home() {
 
 func (ps *PrinterService) SetBedTemp(temp float64) {
 	// TODO: check max temp
+	if ps == nil {
+		fmt.Println("service is nil")
+	}
+	if ps.Pdp == nil {
+		fmt.Println("printer data port is nil")
+	}
 	ps.Pdp.SetBedTemp(temp)
 }
 
