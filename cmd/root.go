@@ -28,6 +28,7 @@ func registerCommands(pSvc *services.PrinterService, sSvc services.SettingsServi
 	RootCmd.AddCommand(NewDeleteCmd(sSvc))
 	RootCmd.AddCommand(NewListCmd(sSvc))
 	RootCmd.AddCommand(NewConnectCmd(pSvc, sSvc))
+	RootCmd.AddCommand(NewSetCmd(pSvc, sSvc))
 }
 
 func init() {
