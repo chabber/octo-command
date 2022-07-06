@@ -11,6 +11,7 @@ import (
 var flagBedTemp string
 var flagToolTemp string
 var flagTempProfile string
+var flagTempOff bool
 
 func NewSetCmd(ps *services.PrinterService, ss services.SettingsService) *cobra.Command {
 	setCmd := &cobra.Command{
@@ -27,6 +28,7 @@ func NewSetCmd(ps *services.PrinterService, ss services.SettingsService) *cobra.
 	setTempCmd.Flags().StringVarP(&flagBedTemp, "bed", "b", "", "Set bed temp")
 	setTempCmd.Flags().StringVarP(&flagToolTemp, "tool", "t", "", "Set tool temp")
 	setTempCmd.Flags().StringVarP(&flagTempProfile, "profile", "p", "", "Set temp by profile")
+	setTempCmd.Flags().BoolVarP(&flagTempOff, "off", "o", false, "Turn off heaters")
 	setCmd.AddCommand(setTempCmd)
 
 	return setCmd
@@ -34,6 +36,7 @@ func NewSetCmd(ps *services.PrinterService, ss services.SettingsService) *cobra.
 
 func runSetTempCmd(ps *services.PrinterService, ss services.SettingsService) util.RunFunc {
 	return func(cmd *cobra.Command, args []string) {
+
 		// set temp based on profile
 		if flagTempProfile != "" {
 			p, _ := ss.GetTempProfile(flagTempProfile)
@@ -41,8 +44,13 @@ func runSetTempCmd(ps *services.PrinterService, ss services.SettingsService) uti
 			ps.SetToolTemp(p.ToolTemp)
 		} else {
 			if flagToolTemp != "" {
-				f, _ := strconv.ParseFloat(flagToolTemp, 64)
-				ps.SetToolTemp(f)
+				var temp float64
+				if flagTempOff {
+					temp = 0
+				} else {
+					temp, _ = strconv.ParseFloat(flagToolTemp, 64)
+				}
+				ps.SetToolTemp(temp)
 			}
 
 			if flagBedTemp != "" {
