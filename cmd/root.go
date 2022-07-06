@@ -29,6 +29,7 @@ func registerCommands(pSvc *services.PrinterService, sSvc services.SettingsServi
 	RootCmd.AddCommand(NewListCmd(sSvc))
 	RootCmd.AddCommand(NewConnectCmd(pSvc, sSvc))
 	RootCmd.AddCommand(NewSetCmd(pSvc, sSvc))
+	RootCmd.AddCommand(NewMonitorCmd(pSvc))
 }
 
 func init() {

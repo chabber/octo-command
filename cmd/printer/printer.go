@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"octo-command/cmd/util"
 	"octo-command/services"
-	"strconv"
 	"strings"
 	"time"
 
@@ -47,15 +46,6 @@ func NewCmd(ps services.PrinterService, ss services.SettingsService) *cobra.Comm
 	}
 	printerCmd.AddCommand(homeSubCmd)
 
-	tempCmd := &cobra.Command{
-		Use:   "temp {[set] | [monitor]}",
-		Short: "Temperature interface for OctoPrint server",
-		Long:  "Monitor and set bed and tool temperatures",
-		Args:  cobra.ExactArgs(1),
-		Run:   runTempCmd(ps, ss),
-	}
-	printerCmd.AddCommand(tempCmd)
-
 	monitorSubCmd := &cobra.Command{
 		Use:   "monitor",
 		Short: "Monitor temperature",
@@ -65,37 +55,7 @@ func NewCmd(ps services.PrinterService, ss services.SettingsService) *cobra.Comm
 	}
 	printerCmd.AddCommand(monitorSubCmd)
 
-	setSubCmd := &cobra.Command{
-		Use:                   "set {[--bed=BED_TEMP] [--t=TOOL_TEMP] | [--profile=TEMP_PROFILE]}",
-		Short:                 "Set temperature",
-		Long:                  "Set temperature of bed/tool",
-		DisableFlagsInUseLine: true,
-		Run:                   runSetSubCmd(ps, ss),
-	}
-	printerCmd.AddCommand(setSubCmd)
-
 	return printerCmd
-}
-
-func runSetSubCmd(ps services.PrinterService, ss services.SettingsService) util.RunFunc {
-	return func(cmd *cobra.Command, args []string) {
-		// set temp based on profile
-		if flagTempProfile != "" {
-			p := ss.GetTempProfile(flagTempProfile)
-			ps.SetBedTemp(p.BedTemp)
-			ps.SetToolTemp(p.ToolTemp)
-		} else {
-			if flagToolTemp != "" {
-				f, _ := strconv.ParseFloat(flagBedTemp, 64)
-				ps.SetToolTemp(f)
-			}
-
-			if flagBedTemp != "" {
-				f, _ := strconv.ParseFloat(flagBedTemp, 64)
-				ps.SetBedTemp(f)
-			}
-		}
-	}
 }
 
 func runMonitorSubCmd(ps services.PrinterService) util.RunFunc {
@@ -130,15 +90,6 @@ func runMonitorSubCmd(ps services.PrinterService) util.RunFunc {
 		fmt.Scanf("%s")
 		quit <- true
 		fmt.Print(SHOW_CURSOR)
-	}
-}
-
-func runTempCmd(ps services.PrinterService, ss services.SettingsService) util.RunFunc {
-	return func(cmd *cobra.Command, args []string) {
-		p := ss.GetTempProfile(args[0])
-
-		ps.SetBedTemp(p.BedTemp)
-		ps.SetToolTemp(p.ToolTemp)
 	}
 }
 
