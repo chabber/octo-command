@@ -65,6 +65,6 @@ func runMonitorTempCmd(ps *services.PrinterService) util.RunFunc {
 		// wait for keyboard input to kill thread
 		fmt.Scanf("%s")
 		quit <- true
-		fmt.Print(SHOW_CURSOR)
+		fmt.Print("\n\n", SHOW_CURSOR)
 	}
 }
