@@ -75,7 +75,7 @@ func runMonitorSubCmd(ps services.PrinterService) util.RunFunc {
 					return
 				default:
 					bedTemp, _ := ps.GetBedTemp()
-					toolTemps := ps.GetToolTemp()
+					toolTemps, _ := ps.GetToolTemp()
 					fmt.Printf("%-10s | %-10v | %-10v | %-10v\n", "Bed", bedTemp.Actual, bedTemp.Target, bedTemp.Offset)
 					for _, t := range toolTemps {
 						fmt.Printf("%-10s | %-10v | %-10v | %-10v\n", t.Label, t.Actual, t.Target, t.Offset)
