@@ -43,19 +43,15 @@ func runSetTempCmd(ps *services.PrinterService, ss services.SettingsService) uti
 			ps.SetBedTemp(p.BedTemp)
 			ps.SetToolTemp(p.ToolTemp)
 		} else {
-			if flagToolTemp != "" {
-				var temp float64
-				if flagTempOff {
-					temp = 0
-				} else {
-					temp, _ = strconv.ParseFloat(flagToolTemp, 64)
-				}
+			if flagTempOff {
+				ps.SetToolTemp(0)
+				ps.SetBedTemp(0)
+			} else if flagToolTemp != "" {
+				temp, _ := strconv.ParseFloat(flagToolTemp, 64)
 				ps.SetToolTemp(temp)
-			}
-
-			if flagBedTemp != "" {
-				f, _ := strconv.ParseFloat(flagBedTemp, 64)
-				ps.SetBedTemp(f)
+			} else if flagBedTemp != "" {
+				temp, _ := strconv.ParseFloat(flagBedTemp, 64)
+				ps.SetBedTemp(temp)
 			}
 		}
 
