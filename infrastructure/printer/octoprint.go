@@ -20,6 +20,22 @@ func NewOctoServerService(c *octoprint.Client) *octoServerService {
 	}
 }
 
+func (os *octoServerService) SendCommand(c string) error {
+	if os.client == nil {
+		return errors.New("error: not connected to OctoPrint server")
+	}
+
+	r := octoprint.CommandRequest{
+		Commands: []string{c},
+	}
+	err := r.Do(os.client)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (os *octoServerService) PrintFile(f string) error {
 	if os.client == nil {
 		return errors.New("error: not connected to OctoPrint server")

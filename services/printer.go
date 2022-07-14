@@ -17,6 +17,10 @@ func NewPrinterService(data printer.PrinterDataPort) *PrinterService {
 	}
 }
 
+func (ps *PrinterService) SendCommand(c string) error {
+	return ps.Pdp.SendCommand(c)
+}
+
 func (ps *PrinterService) PrintFile(f string) error {
 	return ps.Pdp.PrintFile(f)
 }

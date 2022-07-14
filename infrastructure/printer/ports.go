@@ -14,4 +14,5 @@ type PrinterDataPort interface {
 	Home()
 	SetBedTemp(temp float64)
 	SetToolTemp(temp float64)
+	SendCommand(c string) error
 }
